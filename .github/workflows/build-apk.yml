@@ -20,6 +20,7 @@ jobs:
           mkdir -p purchases-build
           base64 -d purchases_project.zip.b64 > purchases.zip
           unzip -q purchases.zip -d purchases-build
+          sed -i 's/WebView\.enableSafeBrowsing(this, null);/WebView.startSafeBrowsing(this, null);/' purchases-build/app/src/main/java/com/bimdamascus/purchases/MainActivity.java
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
