@@ -49,6 +49,14 @@ jobs:
           PY
           grep -q '@drawable/bim_mark' purchases-build/app/src/main/AndroidManifest.xml
 
+          # This lightweight project does not generate BuildConfig; keep the app version explicit.
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('purchases-build/app/src/main/java/com/bimdamascus/purchases/MainActivity.java')
+          s=p.read_text().replace('BuildConfig.VERSION_NAME', '"3.0.0"')
+          p.write_text(s)
+          PY
+
           grep -q 'BIMDamascusPurchases/3.0' purchases-build/app/src/main/java/com/bimdamascus/purchases/MainActivity.java
           grep -q 'versionName = "3.0.0"' purchases-build/app/build.gradle.kts
           grep -q 'USE_BIOMETRIC' purchases-build/app/src/main/AndroidManifest.xml
