@@ -36,9 +36,18 @@ jobs:
           mkdir -p purchases-build/app/src/main/res/drawable-nodpi
           printf '%s' "$BIM_MARK" | base64 -d > purchases-build/app/src/main/res/drawable-nodpi/bim_mark.png
 
-          # Use BIM mark for launcher foreground if legacy source still references drawable icon.
-          sed -i 's/android:icon="@drawable\/ic_launcher"/android:icon="@drawable\/bim_mark"/' purchases-build/app/src/main/AndroidManifest.xml || true
-          sed -i 's/android:roundIcon="@drawable\/ic_launcher"/android:roundIcon="@drawable\/bim_mark"/' purchases-build/app/src/main/AndroidManifest.xml || true
+          # Use BIM mark for all launcher icon references in the restored source.
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('purchases-build/app/src/main/AndroidManifest.xml')
+          s=p.read_text()
+          s=s.replace('@mipmap/ic_launcher_round','@drawable/bim_mark')
+          s=s.replace('@mipmap/ic_launcher','@drawable/bim_mark')
+          s=s.replace('@drawable/ic_launcher_round','@drawable/bim_mark')
+          s=s.replace('@drawable/ic_launcher','@drawable/bim_mark')
+          p.write_text(s)
+          PY
+          grep -q '@drawable/bim_mark' purchases-build/app/src/main/AndroidManifest.xml
 
           grep -q 'BIMDamascusPurchases/3.0' purchases-build/app/src/main/java/com/bimdamascus/purchases/MainActivity.java
           grep -q 'versionName = "3.0.0"' purchases-build/app/build.gradle.kts
